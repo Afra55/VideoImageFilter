@@ -46,6 +46,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        test_pixel.setOnClickListener {
+            if (photoBitmap != null) {
+                logicBitmap(photoBitmap!!){
+                    photoBitmap = it
+                    Glide.with(this).load(it).into(sample_image)
+                }
+            }
+        }
         // GlobalScope.launch(Dispatchers.IO)
     }
 
@@ -76,11 +84,11 @@ class MainActivity : AppCompatActivity() {
                 val width = resource.width
                 val height = resource.height
                 val size = width * height
-                val b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                 val intArray = IntArray(size)
                 resource.getPixels(intArray, 0, width, 0, 0, width, height)
-                val nowPixels = bitmapLogicFromJNI(intArray, width, height, width)
-                b.setPixels(nowPixels, 0, width, 0, 0, width, height)
+                val b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                bitmapLogicFromJNI(intArray, width, height, width)
+                b.setPixels(intArray, 0, width, 0, 0, width, height)
                 b
             } catch (e:Exception){
                 null
@@ -115,7 +123,7 @@ class MainActivity : AppCompatActivity() {
      * which is packaged with this application.
      */
     external fun stringFromJNI(): String
-    external fun bitmapLogicFromJNI(src:IntArray, w:Int, h:Int, stride:Int):IntArray
+    external fun bitmapLogicFromJNI(src:IntArray, w:Int, h:Int, stride:Int)
 
     companion object {
         // Used to load the 'native-lib' library on application startup.
