@@ -1,0 +1,8 @@
+//
+// Created by Victor on 12/28/20.
+//
+
+#ifndef VIDEOIMAGEFILTER_COMMON_H
+#define VIDEOIMAGEFILTER_COMMON_H
+
+#endif //VIDEOIMAGEFILTER_COMMON_H

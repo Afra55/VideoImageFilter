@@ -6,12 +6,18 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -39,6 +45,8 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(chooserIntent, 1)
             }
         }
+
+        // GlobalScope.launch(Dispatchers.IO)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -61,6 +69,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun logicBitmap(resource: Bitmap, l:(Bitmap?)->Unit) {
+        loading.visibility = View.VISIBLE
+        GlobalScope.launch(Dispatchers.IO){
+            val result = try {
+                val width = resource.width
+                val height = resource.height
+                val size = width * height
+                val b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                val intArray = IntArray(size)
+                resource.getPixels(intArray, 0, width, 0, 0, width, height)
+                val nowPixels = bitmapLogicFromJNI(intArray, width, height, width)
+                b.setPixels(nowPixels, 0, width, 0, 0, width, height)
+                b
+            } catch (e:Exception){
+                null
+            }
+
+            GlobalScope.launch(Dispatchers.Main){
+                l.invoke(result)
+                loading.visibility = View.GONE
+            }
+        }
+
+
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         if (photoBitmap?.isRecycled != true) {
@@ -81,6 +115,7 @@ class MainActivity : AppCompatActivity() {
      * which is packaged with this application.
      */
     external fun stringFromJNI(): String
+    external fun bitmapLogicFromJNI(src:IntArray, w:Int, h:Int, stride:Int):IntArray
 
     companion object {
         // Used to load the 'native-lib' library on application startup.
