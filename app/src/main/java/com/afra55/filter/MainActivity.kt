@@ -49,17 +49,13 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        sample_image.setOnTouchListener { v, event ->
+        sample_image_container.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    if (originBitmap != null) {
-                        Glide.with(this).load(originBitmap).into(sample_image)
-                    }
+                     sample_image.visibility = View.GONE
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (photoBitmap != null) {
-                        Glide.with(this).load(photoBitmap).into(sample_image)
-                    }
+                    sample_image.visibility = View.VISIBLE
                 }
                 -999 -> {
                     v.performClick()
@@ -86,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             val photo = data?.dataString
             if (photo != null) {
-                Glide.with(this).load(photo).into(sample_image)
+
                 Glide.with(this).asBitmap().load(photo).into(object : CustomTarget<Bitmap>() {
                     override fun onLoadCleared(placeholder: Drawable?) {
 
@@ -98,6 +94,8 @@ class MainActivity : AppCompatActivity() {
                     ) {
                         photoBitmap = resource
                         originBitmap = resource
+                        Glide.with(this@MainActivity).load(originBitmap).into(origin_image)
+                        Glide.with(this@MainActivity).load(photoBitmap).into(sample_image)
                     }
 
                 })

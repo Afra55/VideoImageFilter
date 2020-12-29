@@ -29,11 +29,21 @@
             app:layout_constraintTop_toTopOf="parent"
             />
 
-        <ImageView
-            android:id="@+id/sample_image"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:adjustViewBounds="true"
-            android:layout_height="wrap_content"/>
+            android:id="@+id/sample_image_container"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/origin_image"
+                android:layout_width="match_parent"
+                android:adjustViewBounds="true"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:id="@+id/sample_image"
+                android:layout_width="match_parent"
+                android:adjustViewBounds="true"
+                android:layout_height="wrap_content"/>
+        </FrameLayout>
 
         <Button
             android:id="@+id/test_pixel"
