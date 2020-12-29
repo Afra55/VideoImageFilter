@@ -49,8 +49,10 @@ class MainActivity : AppCompatActivity() {
         test_pixel.setOnClickListener {
             if (photoBitmap != null) {
                 logicBitmap(photoBitmap!!){
-                    photoBitmap = it
-                    Glide.with(this).load(it).into(sample_image)
+                    if (!isFinishing) {
+                        photoBitmap = it
+                        Glide.with(this).load(it).into(sample_image)
+                    }
                 }
             }
         }
