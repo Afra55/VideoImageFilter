@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -22,7 +23,8 @@ import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
-    var photoBitmap:Bitmap? = null
+    var photoBitmap: Bitmap? = null
+    var originBitmap: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,9 +48,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
+        sample_image.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (originBitmap != null) {
+                        Glide.with(this).load(originBitmap).into(sample_image)
+                    }
+                }
+                MotionEvent.ACTION_UP -> {
+                    if (photoBitmap != null) {
+                        Glide.with(this).load(photoBitmap).into(sample_image)
+                    }
+                }
+                -999 -> {
+                    v.performClick()
+                }
+            }
+            true
+        }
+
         test_pixel.setOnClickListener {
             if (photoBitmap != null) {
-                logicBitmap(photoBitmap!!){
+                logicBitmap(photoBitmap!!) {
                     if (!isFinishing) {
                         photoBitmap = it
                         Glide.with(this).load(it).into(sample_image)
@@ -63,15 +85,19 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             val photo = data?.dataString
-            if (photo != null){
+            if (photo != null) {
                 Glide.with(this).load(photo).into(sample_image)
                 Glide.with(this).asBitmap().load(photo).into(object : CustomTarget<Bitmap>() {
                     override fun onLoadCleared(placeholder: Drawable?) {
 
                     }
 
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
                         photoBitmap = resource
+                        originBitmap = resource
                     }
 
                 })
@@ -79,9 +105,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun logicBitmap(resource: Bitmap, l:(Bitmap?)->Unit) {
+    private fun logicBitmap(resource: Bitmap, l: (Bitmap?) -> Unit) {
         loading.visibility = View.VISIBLE
-        GlobalScope.launch(Dispatchers.IO){
+        GlobalScope.launch(Dispatchers.IO) {
             val result = try {
                 val width = resource.width
                 val height = resource.height
@@ -92,11 +118,11 @@ class MainActivity : AppCompatActivity() {
                 bitmapLogicFromJNI(intArray, width, height, width)
                 b.setPixels(intArray, 0, width, 0, 0, width, height)
                 b
-            } catch (e:Exception){
+            } catch (e: Exception) {
                 null
             }
 
-            GlobalScope.launch(Dispatchers.Main){
+            GlobalScope.launch(Dispatchers.Main) {
                 l.invoke(result)
                 loading.visibility = View.GONE
             }
@@ -112,9 +138,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkPermission():Boolean {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1111)
+    private fun checkPermission(): Boolean {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                1111
+            )
             return false
         }
         return true
@@ -125,7 +159,7 @@ class MainActivity : AppCompatActivity() {
      * which is packaged with this application.
      */
     external fun stringFromJNI(): String
-    external fun bitmapLogicFromJNI(src:IntArray, w:Int, h:Int, stride:Int)
+    external fun bitmapLogicFromJNI(src: IntArray, w: Int, h: Int, stride: Int)
 
     companion object {
         // Used to load the 'native-lib' library on application startup.
