@@ -10,10 +10,10 @@
 #define LOGE(...)    __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 #define LOGI(...)    __android_log_print(ANDROID_LOG_INFO, TAG, __VA_ARGS__)
 #define LOGD(...)    __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
-#define RGBA_A(p) (((p) & 0xFF000000) >> 24)
-#define RGBA_R(p) (((p) & 0x00FF0000) >> 16)
-#define RGBA_G(p) (((p) & 0x0000FF00) >>  8)
-#define RGBA_B(p)  ((p) & 0x000000FF)
+#define RGBA_A(p) (((p) & 0xFF000000) >> 24)  // 0, 255
+#define RGBA_R(p) (((p) & 0x00FF0000) >> 16)  // 0 - 255
+#define RGBA_G(p) (((p) & 0x0000FF00) >>  8)  // 0 - 255
+#define RGBA_B(p)  ((p) & 0x000000FF)  // 0 - 255
 #define MAKE_RGBA(r,g,b,a) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b))
 
 typedef unsigned short Char16;

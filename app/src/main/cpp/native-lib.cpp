@@ -42,16 +42,13 @@ Java_com_afra55_filter_MainActivity_bitmapLogicFromJNI(
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             jint pixel = s[y * width + x];
-            uint32_t v = *(uint32_t *)pixel;
-            unsigned int a = 0, r = 0, g = 0, b = 0;
-            a = (((v) & 0xFF000000) >> 24);
-            r = RGBA_R(v);
-            g = RGBA_G(v);
-            b = RGBA_B(v);
-            LOGI("%d %d %d %d", a, r, g, b);
+            int red = RGBA_R(pixel);  //获取红色灰度值
+            int green = RGBA_G(pixel); //获取绿色灰度值
+            int blue = RGBA_B(pixel);         //获取蓝色灰度值
+            int alpha = RGBA_A(pixel);         //获取蓝色灰度值
+            pixel = (int) ((float) red * 0.3 + (float) green * 0.59 + (float) blue * 0.11);
+            pixel = 0xFF << 24 | (pixel << 16) | (pixel << 8) | pixel; //添加透明度
+            s[y * width + x] = pixel;
         }
     }
-//    jintArray children = env->NewIntArray(width * height);
-//    env->SetIntArrayRegion(children, 0, width * height, s);
-//    return children;
 }
