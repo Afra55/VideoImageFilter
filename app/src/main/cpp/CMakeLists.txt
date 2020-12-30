@@ -15,6 +15,7 @@ project("filter")
 # Gradle automatically packages shared libraries with your APK.
 aux_source_directory(. SRC_LIST) # 搜索当前目录下的所有.cpp文件
 aux_source_directory(./utils UTIL_SRC_LIST)
+
 add_library( # Sets the name of the library.
              native-lib
 

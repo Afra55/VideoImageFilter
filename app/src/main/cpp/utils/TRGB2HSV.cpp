@@ -28,7 +28,7 @@ void RGB2HSV(unsigned char R, unsigned char G, unsigned char B, float* h, float*
         *s = (max - min) / max;
     *v = max;
 };
-void HSV2RGB(float h, float s, float v, int* R, int *G, int *B)
+void HSV2RGB(float h, float s, float v, unsigned char* R, unsigned char *G, unsigned char *B)
 {
 	float q = 0, p = 0, t = 0, f = 0, r = 0, g = 0, b = 0;
     int hN = 0;
