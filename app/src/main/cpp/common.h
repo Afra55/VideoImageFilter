@@ -16,6 +16,10 @@
 #define RGBA_B(p)  ((p) & 0x000000FF)  // 0 - 255
 #define MAKE_RGBA(r,g,b,a) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b))
 
+#define MIN2(a, b) ((a) < (b) ? (a) : (b))
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+#define CLIP3(x, a, b) MIN2(MAX2(a,x), b)
+
 typedef unsigned short Char16;
 typedef unsigned int Char32;
 #endif
