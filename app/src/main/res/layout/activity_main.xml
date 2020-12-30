@@ -29,21 +29,22 @@
             app:layout_constraintTop_toTopOf="parent"
             />
 
-        <FrameLayout
+        <com.afra55.filter.SquareFrameLayout
             android:layout_width="match_parent"
             android:id="@+id/sample_image_container"
             android:layout_height="wrap_content">
             <ImageView
+                android:src="@mipmap/ic_launcher"
                 android:id="@+id/origin_image"
                 android:layout_width="match_parent"
                 android:adjustViewBounds="true"
-                android:layout_height="wrap_content"/>
+                android:layout_height="match_parent"/>
             <ImageView
                 android:id="@+id/sample_image"
                 android:layout_width="match_parent"
                 android:adjustViewBounds="true"
-                android:layout_height="wrap_content"/>
-        </FrameLayout>
+                android:layout_height="match_parent"/>
+        </com.afra55.filter.SquareFrameLayout>
 
         <Button
             android:id="@+id/test_pixel"

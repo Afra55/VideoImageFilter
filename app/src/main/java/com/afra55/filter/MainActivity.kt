@@ -11,7 +11,9 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import kotlinx.android.synthetic.main.activity_main.*
@@ -19,24 +21,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import java.util.concurrent.ConcurrentLinkedDeque
 
 
 class MainActivity : AppCompatActivity() {
 
     var photoBitmap: Bitmap? = null
-        set(value) {
-            if (field != null && !field!!.isRecycled) {
-                field!!.recycle()
-            }
-            field = value
-        }
     var originBitmap: Bitmap? = null
-        set(value) {
-            if (field != null && !field!!.isRecycled) {
-                field!!.recycle()
-            }
-            field = value
-        }
+    var cacheBitmapList: ConcurrentLinkedDeque<Bitmap> = ConcurrentLinkedDeque()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,9 +71,16 @@ class MainActivity : AppCompatActivity() {
         test_pixel.setOnClickListener {
             if (photoBitmap != null) {
                 logicBitmap(photoBitmap!!) {
-                    if (!isFinishing) {
-                        photoBitmap = it
-                        Glide.with(this).load(it).into(sample_image)
+                    if (it != null && !it.isRecycled) {
+                        if (!isFinishing) {
+                            val ob = photoBitmap
+                            photoBitmap = it
+                            Glide.with(this).load(it).into(sample_image)
+                            if (ob?.isRecycled != true) {
+                                ob?.recycle()
+                            }
+
+                        }
                     }
                 }
             }
@@ -116,6 +115,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun logicBitmap(resource: Bitmap, l: (Bitmap?) -> Unit) {
+//        if (loading.isVisible) {
+//            return
+//        }
         loading.visibility = View.VISIBLE
         GlobalScope.launch(Dispatchers.IO) {
             val result = try {
@@ -124,17 +126,42 @@ class MainActivity : AppCompatActivity() {
                 val size = width * height
                 val intArray = IntArray(size)
                 resource.getPixels(intArray, 0, width, 0, 0, width, height)
-                val b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                bitmapLogicFromJNI(intArray, width, height, width)
-                b.setPixels(intArray, 0, width, 0, 0, width, height)
-                b
-            } catch (e: Exception) {
+                var cb:Bitmap? = cacheBitmapList.poll()
+                while (cb != null) {
+                    if (!cb.isRecycled) {
+                        cb.recycle()
+                    }
+                    cb = cacheBitmapList.poll()
+                }
+                val b = try {
+                    Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                } catch (e: OutOfMemoryError) {
+                    System.gc()
+                    System.runFinalization()
+                    Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                }
+                cacheBitmapList.add(b)
+                if (!b.isRecycled) {
+                    bitmapLogicFromJNI(intArray, width, height, width)
+                    if (!b.isRecycled) {
+                        b.setPixels(intArray, 0, width, 0, 0, width, height)
+                        b
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                }
+            } catch (e: Throwable) {
+                e.printStackTrace()
                 null
             }
 
             GlobalScope.launch(Dispatchers.Main) {
                 l.invoke(result)
-                loading.visibility = View.GONE
+                if (result != null) {
+                    loading.visibility = View.GONE
+                }
             }
         }
 
@@ -142,13 +169,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        Glide.with(applicationContext).clear(sample_image);
+        Glide.with(applicationContext).clear(origin_image);
+        Glide.get(applicationContext).bitmapPool.clearMemory();
         if (photoBitmap?.isRecycled != true) {
             photoBitmap?.recycle()
         }
         if (originBitmap?.isRecycled != true) {
             originBitmap?.recycle()
         }
+        var cb:Bitmap? = cacheBitmapList.poll()
+        while (cb != null) {
+            if (!cb.isRecycled) {
+                cb.recycle()
+            }
+            cb = cacheBitmapList.poll()
+        }
+        super.onDestroy()
     }
 
     private fun checkPermission(): Boolean {
