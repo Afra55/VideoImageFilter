@@ -24,7 +24,19 @@ import java.lang.Exception
 class MainActivity : AppCompatActivity() {
 
     var photoBitmap: Bitmap? = null
+        set(value) {
+            if (field != null && !field!!.isRecycled) {
+                field!!.recycle()
+            }
+            field = value
+        }
     var originBitmap: Bitmap? = null
+        set(value) {
+            if (field != null && !field!!.isRecycled) {
+                field!!.recycle()
+            }
+            field = value
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         sample_image_container.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                     sample_image.visibility = View.GONE
+                    sample_image.visibility = View.GONE
                 }
                 MotionEvent.ACTION_UP -> {
                     sample_image.visibility = View.VISIBLE
@@ -133,6 +145,9 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         if (photoBitmap?.isRecycled != true) {
             photoBitmap?.recycle()
+        }
+        if (originBitmap?.isRecycled != true) {
+            originBitmap?.recycle()
         }
     }
 
