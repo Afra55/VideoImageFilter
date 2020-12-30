@@ -3,6 +3,8 @@
 #include "common.h"
 #include "utils/TRGB2HSV.h"
 #include "utils/TRGB2YUV.h"
+#include "utils/TRGB2LAB.h"
+#include "utils/TGray.h"
 
 
 jint makeGray(jint pixel, int red, int green, int blue);
@@ -16,20 +18,6 @@ Java_com_afra55_filter_MainActivity_stringFromJNI(
     std::string hello = "From C++: 点击选择图片";
     LOGD("JNI 进入成功");
     return env->NewStringUTF(hello.c_str());
-}
-
-/**
- * 灰度化像素
- * @param pixel
- * @param red
- * @param green
- * @param blue
- * @return
- */
-jint makeGray(jint pixel, int red, int green, int blue) {
-    pixel = (int) ((float) red * 0.3 + (float) green * 0.59 + (float) blue * 0.11);
-    pixel = 0xFF << 24 | (pixel << 16) | (pixel << 8) | pixel; //添加透明度
-    return pixel;
 }
 
 /**
@@ -61,7 +49,7 @@ Java_com_afra55_filter_MainActivity_bitmapLogicFromJNI(
         int stride
 ) {
 
-    jboolean isCopy = JNI_TRUE;
+    jboolean isCopy = JNI_FALSE;
     jint * pixelArray = env->GetIntArrayElements(src, &isCopy);
 
     for (int y = 0; y < height; ++y) {
@@ -72,10 +60,7 @@ Java_com_afra55_filter_MainActivity_bitmapLogicFromJNI(
             unsigned char G = RGBA_G(pixel); //获取绿色灰度值
             unsigned char B = RGBA_B(pixel);         //获取蓝色灰度值
             unsigned char A = RGBA_A(pixel);         //获取蓝色灰度值
-            float hIntensity = 17;
-            float sIntensity = 0.09;
-            float vIntensity = 0.14;
-            HSVAdjust(hIntensity, sIntensity, vIntensity, R, G, B);
+            TGray( &R, &G, &B, 2);
             pixelArray[index] = MAKE_RGBA(R, G, B, A);
         }
     }
