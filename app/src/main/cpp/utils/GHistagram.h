@@ -8,6 +8,8 @@ Description: Histagram
 #ifndef __TEST_HISTAGRAM__
 #define __TEST_HISTAGRAM__
 
+#include <jni.h>
+
 #ifdef _MSC_VER
 
 #ifdef __cplusplus
