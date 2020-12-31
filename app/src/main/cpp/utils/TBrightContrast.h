@@ -1,5 +1,5 @@
-#ifndef __TEST_HISTAGRAM__
-#define __TEST_HISTAGRAM__
+#ifndef __TEST_BRIGHT_CONTRAST__
+#define __TEST_BRIGHT_CONTRAST__
 
 #include <jni.h>
 
@@ -12,17 +12,18 @@
 #endif
 
 /************************************************************
-*Function:  Histagram
-*Description: Compute histagram
+*Function:  Bright&contrast adjust
+*Description: Bright and contrast adjust process
 *Params:    
 *srcData:  image bgr data     
 *width  :image width
 *height :image height
 *stride :image stride
-*mode: 0-Gray histagram,1-Red histagram, 2-Green histagram, 3-Blue histagram
+*bright: range [-100,100]
+*contrast: range [-100,100]
 *Return :0-OK,or failed    
 ************************************************************/
-EXPORT int f_Histagram(unsigned char *srcData, int width, int height, int stride, int hist[], int mode);
+EXPORT int f_BrightContrast(unsigned char *srcData, int width, int height, int stride, int bright, int contrast);
 
 
 #else
@@ -30,7 +31,7 @@ EXPORT int f_Histagram(unsigned char *srcData, int width, int height, int stride
 #ifdef __cplusplus
 extern "C" {
 #endif   
-	void GHistagram(const jint *pixelArray, int width, int height, int *hist, int mode);
+	void TBrightContrast(jint *pixelArray, int width, int height, int bright, int contrast);
 
 
 	////

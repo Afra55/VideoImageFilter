@@ -19,17 +19,8 @@
  * @param mode
  */
 void GHistagram(const jint *pixelArray, int width, int height, int *hist, int mode) {
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            int index = y * width + x;
-            jint pixel = pixelArray[index];
-            unsigned char R = RGBA_R(pixel);
-            unsigned char G = RGBA_G(pixel);
-            unsigned char B = RGBA_B(pixel);
-            unsigned char A = RGBA_A(pixel);
-        }
-    }
-    int i, j, gray, offset;
+
+    int gray;
     switch (mode) {
         case 0://Gray histagram
 

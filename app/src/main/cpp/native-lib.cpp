@@ -5,6 +5,8 @@
 #include "utils/TRGB2YUV.h"
 #include "utils/TRGB2LAB.h"
 #include "utils/TGray.h"
+#include "utils/TThreshold.h"
+#include "utils/TBrightContrast.h"
 
 
 jint makeGray(jint pixel, int red, int green, int blue);
@@ -51,18 +53,22 @@ Java_com_afra55_filter_MainActivity_bitmapLogicFromJNI(
 
     jboolean isCopy = JNI_FALSE;
     jint * pixelArray = env->GetIntArrayElements(src, &isCopy);
+    TBrightContrast(pixelArray, width, height, 100, 50);
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            int index = y * width + x;
-            jint pixel = pixelArray[index];
-            unsigned char R = RGBA_R(pixel);  //获取红色灰度值
-            unsigned char G = RGBA_G(pixel); //获取绿色灰度值
-            unsigned char B = RGBA_B(pixel);         //获取蓝色灰度值
-            unsigned char A = RGBA_A(pixel);         //获取蓝色灰度值
-            TGray( &R, &G, &B, 2);
-            pixelArray[index] = MAKE_RGBA(R, G, B, A);
-        }
-    }
+//    for (int y = 0; y < height; ++y) {
+//        for (int x = 0; x < width; ++x) {
+//            int index = y * width + x;
+//            jint pixel = pixelArray[index];
+//            unsigned char R = RGBA_R(pixel);
+//            unsigned char G = RGBA_G(pixel);
+//            unsigned char B = RGBA_B(pixel);
+//            unsigned char A = RGBA_A(pixel);
+//            int l, a, b;
+//            RGB2LAB( R, G, B, &l, &a, &b);
+//            l = 100;
+//            LAB2RGB(l, a, b, &R, &G, &B);
+//            pixelArray[index] = MAKE_RGBA(R, G, B, A);
+//        }
+//    }
 }
 
