@@ -52,6 +52,12 @@
             android:layout_height="wrap_content"
             android:text="test pixel"/>
 
+        <Button
+            android:id="@+id/test_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"/>
+
     </LinearLayout>
 
     <ProgressBar

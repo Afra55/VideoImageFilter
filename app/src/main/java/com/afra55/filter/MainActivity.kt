@@ -1,14 +1,21 @@
 package com.afra55.filter
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.media.MediaScannerConnection
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
@@ -20,6 +27,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.lang.Exception
 import java.util.concurrent.ConcurrentLinkedDeque
 
@@ -86,6 +96,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
         // GlobalScope.launch(Dispatchers.IO)
+
+        test_save.setOnClickListener {
+            if (photoBitmap != null) {
+                saveImageToStorage(photoBitmap!!)
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -126,7 +142,7 @@ class MainActivity : AppCompatActivity() {
                 val size = width * height
                 val intArray = IntArray(size)
                 resource.getPixels(intArray, 0, width, 0, 0, width, height)
-                var cb:Bitmap? = cacheBitmapList.poll()
+                var cb: Bitmap? = cacheBitmapList.poll()
                 while (cb != null) {
                     if (!cb.isRecycled) {
                         cb.recycle()
@@ -178,7 +194,7 @@ class MainActivity : AppCompatActivity() {
         if (originBitmap?.isRecycled != true) {
             originBitmap?.recycle()
         }
-        var cb:Bitmap? = cacheBitmapList.poll()
+        var cb: Bitmap? = cacheBitmapList.poll()
         while (cb != null) {
             if (!cb.isRecycled) {
                 cb.recycle()
@@ -196,12 +212,94 @@ class MainActivity : AppCompatActivity() {
         ) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                arrayOf(
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ),
                 1111
             )
             return false
         }
         return true
+    }
+
+    private fun saveImageToStorage(
+        bitmap: Bitmap,
+        filename: String = "filter_${System.currentTimeMillis()}.jpg",
+        mimeType: String = "image/jpeg",
+        directory: String = Environment.DIRECTORY_PICTURES,
+        mediaContentUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    ) {
+        if (loading.isVisible) {
+            return
+        }
+        loading.visibility = View.VISIBLE
+        GlobalScope.launch(Dispatchers.IO) {
+
+            try {
+                val imageOutStream: OutputStream?
+                var imageSavedPath: String? = null
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val values = ContentValues().apply {
+                        put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+                        put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+                        put(MediaStore.Images.Media.RELATIVE_PATH, directory)
+                    }
+
+                    contentResolver.run {
+                        val uri =
+                            contentResolver.insert(mediaContentUri, values)
+                        imageOutStream = uri?.let { openOutputStream(it) }
+                    }
+                } else {
+                    val imagePath =
+                        Environment.getExternalStoragePublicDirectory(directory).absolutePath
+                    val image = File(imagePath, filename)
+                    if (image.parentFile?.exists() != true) {
+                        image.parentFile?.mkdirs()
+                    }
+                    imageOutStream = FileOutputStream(image)
+                    imageSavedPath = image.absolutePath
+                }
+
+                if (imageOutStream != null) {
+                    imageOutStream.use { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it) }
+
+                    GlobalScope.launch(Dispatchers.Main) {
+
+                        loading.visibility = View.GONE
+
+                        try {
+                            if (imageSavedPath != null) {
+                                MediaScannerConnection.scanFile(
+                                    this@MainActivity,
+                                    arrayOf(imageSavedPath),
+                                    arrayOf(mimeType)
+                                ) { path, uri ->
+
+                                }
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    imageSavedPath,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "$filename saved",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } catch (e: Exception) {
+                        }
+                    }
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     /**
