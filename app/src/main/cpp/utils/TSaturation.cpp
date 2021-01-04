@@ -21,7 +21,7 @@ void TSaturation(unsigned char *R, unsigned char *G, unsigned char *B, int satur
     rgbMax = MAX2(MAX2(*R, *G), *B);
     int delta = (rgbMax - rgbMin);
     int value = (rgbMax + rgbMin);
-    if (delta >= 0) {
+    if (delta != 0) {
         int L = value >> 1;
         int S = L < 128 ? (delta << 7) / value : (delta << 7) / (510 - value);
         if (k >= 0) {
@@ -29,9 +29,9 @@ void TSaturation(unsigned char *R, unsigned char *G, unsigned char *B, int satur
             alpha = 128 * 128 / alpha - 128;
         } else
             alpha = k;
-        *R = *R + ((*R - L) * alpha >> 7);
-        *G = *G + ((*G - L) * alpha >> 7);
-        *B = *B + ((*B - L) * alpha >> 7);
+        *R = CLIP3(*R + ((*R - L) * alpha >> 7), 0, 255);
+        *G = CLIP3(*G + ((*G - L) * alpha >> 7), 0, 255);
+        *B = CLIP3(*B + ((*B - L) * alpha >> 7), 0, 255);
     }
 }
 
