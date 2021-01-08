@@ -86,10 +86,10 @@ class MainActivity : AppCompatActivity() {
                             val ob = photoBitmap
                             photoBitmap = it
                             Glide.with(this).load(it).into(sample_image)
-                            if (ob?.isRecycled != true) {
+
+                            if (ob != photoBitmap && ob?.isRecycled != true) {
                                 ob?.recycle()
                             }
-
                         }
                     }
                 }
@@ -119,6 +119,7 @@ class MainActivity : AppCompatActivity() {
                         resource: Bitmap,
                         transition: Transition<in Bitmap>?
                     ) {
+                        recycledCachedBitmap()
                         photoBitmap = resource
                         originBitmap = resource
                         Glide.with(this@MainActivity).load(originBitmap).into(origin_image)
@@ -142,13 +143,7 @@ class MainActivity : AppCompatActivity() {
                 val size = width * height
                 val intArray = IntArray(size)
                 resource.getPixels(intArray, 0, width, 0, 0, width, height)
-                var cb: Bitmap? = cacheBitmapList.poll()
-                while (cb != null) {
-                    if (!cb.isRecycled) {
-                        cb.recycle()
-                    }
-                    cb = cacheBitmapList.poll()
-                }
+                recycledCachedBitmap()
                 val b = try {
                     Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                 } catch (e: OutOfMemoryError) {
@@ -194,14 +189,18 @@ class MainActivity : AppCompatActivity() {
         if (originBitmap?.isRecycled != true) {
             originBitmap?.recycle()
         }
+        recycledCachedBitmap()
+        super.onDestroy()
+    }
+
+    private fun recycledCachedBitmap() {
         var cb: Bitmap? = cacheBitmapList.poll()
         while (cb != null) {
-            if (!cb.isRecycled) {
+            if (!cb.isRecycled && cb != photoBitmap)  {
                 cb.recycle()
             }
             cb = cacheBitmapList.poll()
         }
-        super.onDestroy()
     }
 
     private fun checkPermission(): Boolean {

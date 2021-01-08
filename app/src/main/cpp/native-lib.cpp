@@ -8,6 +8,7 @@
 #include "utils/TThreshold.h"
 #include "utils/TBrightContrast.h"
 #include "utils/TSaturation.h"
+#include "utils/GMeanFilter.h"
 
 
 jint makeGray(jint pixel, int red, int green, int blue);
@@ -55,18 +56,19 @@ Java_com_afra55_filter_MainActivity_bitmapLogicFromJNI(
     jboolean isCopy = JNI_FALSE;
     jint * pixelArray = env->GetIntArrayElements(src, &isCopy);
 //    TBrightContrast(pixelArray, width, height, 0, 80);
+    GFastMeanFilter(pixelArray, width, height, 1);
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            int index = y * width + x;
-            jint pixel = pixelArray[index];
-            unsigned char R = RGBA_R(pixel);
-            unsigned char G = RGBA_G(pixel);
-            unsigned char B = RGBA_B(pixel);
-            unsigned char A = RGBA_A(pixel);
-            TSaturation( &R, &G, &B, 100);
-            pixelArray[index] = MAKE_RGBA(R, G, B, A);
-        }
-    }
+//    for (int y = 0; y < height; ++y) {
+//        for (int x = 0; x < width; ++x) {
+//            int index = y * width + x;
+//            jint pixel = pixelArray[index];
+//            unsigned char R = RGBA_R(pixel);
+//            unsigned char G = RGBA_G(pixel);
+//            unsigned char B = RGBA_B(pixel);
+//            unsigned char A = RGBA_A(pixel);
+//            TSaturation( &R, &G, &B, 100);
+//            pixelArray[index] = MAKE_RGBA(R, G, B, A);
+//        }
+//    }
 }
 
