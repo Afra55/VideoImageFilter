@@ -20,7 +20,7 @@
 *saturation: range [-100,100]
 *Return :0-OK,or failed    
 ************************************************************/
-EXPORT int f_Saturation(unsigned char *srcData, int width, int height, int stride, int saturation);
+EXPORT void TSaturation(unsigned char *R, unsigned char *G, unsigned char *B, int saturation);
 
 
 #else

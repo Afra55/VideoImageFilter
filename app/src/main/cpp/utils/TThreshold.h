@@ -27,7 +27,7 @@ Description: Threshold
 *T: threshold, range [0,255]
 *Return :0-OK,or failed    
 ************************************************************/
-EXPORT int f_Threshold(unsigned char *srcData, int width, int height, int stride, int T);
+EXPORT void TThreshold(unsigned char R, unsigned char G, unsigned char B, int *gray, int T);
 
 
 #else

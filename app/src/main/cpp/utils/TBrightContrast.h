@@ -23,7 +23,7 @@
 *contrast: range [-100,100]
 *Return :0-OK,or failed    
 ************************************************************/
-EXPORT int f_BrightContrast(unsigned char *srcData, int width, int height, int stride, int bright, int contrast);
+EXPORT int TBrightContrast(jint *pixelArray, int width, int height, int bright, int contrast);
 
 
 #else

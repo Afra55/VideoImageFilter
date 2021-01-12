@@ -9,6 +9,7 @@
 #include "utils/TBrightContrast.h"
 #include "utils/TSaturation.h"
 #include "utils/GMeanFilter.h"
+#include "utils/GGaussFilter.h"
 
 
 jint makeGray(jint pixel, int red, int green, int blue);
@@ -56,7 +57,8 @@ Java_com_afra55_filter_MainActivity_bitmapLogicFromJNI(
     jboolean isCopy = JNI_FALSE;
     jint * pixelArray = env->GetIntArrayElements(src, &isCopy);
 //    TBrightContrast(pixelArray, width, height, 0, 80);
-    GFastMeanFilter(pixelArray, width, height, 1);
+//    GFastMeanFilter(pixelArray, width, height, 3);
+    GFastGaussFilter(pixelArray, width, height, 3);
 
 //    for (int y = 0; y < height; ++y) {
 //        for (int x = 0; x < width; ++x) {

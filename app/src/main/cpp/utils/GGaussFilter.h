@@ -3,10 +3,10 @@ Copyright:   Trent.
 Author:		 Trent1985
 Date:		 2018-9-23
 Mail:        dongtingyueh@163.com
-Description: Mean Filter
+Description: Gauss Filter
 *************************************************************************/
-#ifndef __TEST_MEANFILTER__
-#define __TEST_MEANFILTER__
+#ifndef __TEST_GAUSSFILTER__
+#define __TEST_GAUSSFILTER__
 
 #include <jni.h>
 
@@ -19,24 +19,25 @@ Description: Mean Filter
 #endif
 
 /************************************************************
-*Function:  Fast Mean Filter
-*Description: Fast Mean Filter process
+*Function:  Gauss Filter
+*Description: Gauss Filter process
 *Params:    
 *srcData:  image bgr data     
 *width  :image width
 *height :image height
 *stride :image stride
-*radius: range [0,]
+*r: radius of gauss filter, range [0,]
 *Return :0-OK,or failed    
 ************************************************************/
-EXPORT int GFastMeanFilter(jint * srcData, int width, int height , int radius);
+EXPORT int GFastGaussFilter(jint *srcData, int width, int height, float r);
+
 
 #else
 
 #ifdef __cplusplus
 extern "C" {
 #endif   
-	int GFastMeanFilter(jint * srcData, int width, int height , int radius);
+	int GFastGaussFilter(jint *srcData, int width, int height, float r);
 
 	////
 	#ifdef __cplusplus

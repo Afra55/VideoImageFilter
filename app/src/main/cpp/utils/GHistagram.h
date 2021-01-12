@@ -22,7 +22,7 @@
 *mode: 0-Gray histagram,1-Red histagram, 2-Green histagram, 3-Blue histagram
 *Return :0-OK,or failed    
 ************************************************************/
-EXPORT int f_Histagram(unsigned char *srcData, int width, int height, int stride, int hist[], int mode);
+EXPORT int GHistagram(const jint *pixelArray, int width, int height, int *hist, int mode);
 
 
 #else
