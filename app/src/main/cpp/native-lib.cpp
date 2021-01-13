@@ -11,6 +11,7 @@
 #include "utils/GMeanFilter.h"
 #include "utils/GGaussFilter.h"
 #include "utils/GLaplaceSharpen.h"
+#include "utils/GUSM.h"
 
 
 jint makeGray(jint pixel, int red, int green, int blue);
@@ -59,8 +60,9 @@ Java_com_afra55_filter_MainActivity_bitmapLogicFromJNI(
     jint * pixelArray = env->GetIntArrayElements(src, &isCopy);
 //    TBrightContrast(pixelArray, width, height, 0, 80);
 //    GFastMeanFilter(pixelArray, width, height, 3);
-    GFastGaussFilter(pixelArray, width, height, 1);
-    GLaplaceSharpen(pixelArray, width, height, 1);
+//    GFastGaussFilter(pixelArray, width, height, 1);
+//    GLaplaceSharpen(pixelArray, width, height, 1);
+    GUSM(pixelArray, width, height, 100, 100, 20);
 
 //    for (int y = 0; y < height; ++y) {
 //        for (int x = 0; x < width; ++x) {

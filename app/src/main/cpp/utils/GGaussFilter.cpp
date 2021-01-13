@@ -62,6 +62,7 @@ int GFastGaussFilter(jint *srcData, int width, int height, float r)
     int K = 0;
     int rem = 0;
     int t = 0;
+    unsigned char R, G, B, A;
     for ( j = 0; j < height; j++)
     {
         for ( i = 0; i < width; i++)
@@ -73,15 +74,15 @@ int GFastGaussFilter(jint *srcData, int width, int height, float r)
                 t = rem  + j * width;
                 K = kernel[k + radius];
                 jint pixel = srcData[t];
-                unsigned char R = RGBA_R(pixel);
-                unsigned char G = RGBA_G(pixel);
-                unsigned char B = RGBA_B(pixel);
+                R = RGBA_R(pixel);
+                G = RGBA_G(pixel);
+                B = RGBA_B(pixel);
                 tempB += B * K;
                 tempG += G * K;
                 tempR += R * K;
             }
             v = i  + j * width;
-            unsigned char A = RGBA_A(srcData[v]);
+            A = RGBA_A(srcData[v]);
             tempData[v] = MAKE_RGBA(tempR / totalWei, tempG / totalWei, tempB / totalWei, A);
         }
     }
@@ -96,15 +97,15 @@ int GFastGaussFilter(jint *srcData, int width, int height, float r)
                 t = rem * width + i ;
                 K = kernel[k + radius];
                 jint pixel = tempData[t];
-                unsigned char R = RGBA_R(pixel);
-                unsigned char G = RGBA_G(pixel);
-                unsigned char B = RGBA_B(pixel);
+                R = RGBA_R(pixel);
+                G = RGBA_G(pixel);
+                B = RGBA_B(pixel);
                 tempB += B * K;
                 tempG += G * K;
                 tempR += R * K;
             }
             v = i + j * width;
-            unsigned char A = RGBA_A(srcData[v]);
+            A = RGBA_A(srcData[v]);
             dstData[v] = MAKE_RGBA(tempR / totalWei, tempG / totalWei, tempB / totalWei, A);
         }
     }
